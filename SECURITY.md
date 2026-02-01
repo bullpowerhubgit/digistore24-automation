@@ -4,19 +4,22 @@
 
 ### Current Security Status
 
-**✅ Major vulnerabilities addressed:**
-- Next.js upgraded to 14.2.35 (latest in 14.x branch)
-- Patches DoS vulnerabilities with Server Components
-- Patches Authorization Bypass in Middleware
-- Patches Cache Poisoning vulnerabilities
-- Patches Server-Side Request Forgery in Server Actions
-- @sendgrid/mail upgraded to 8.1.6 (patches axios CSRF vulnerabilities)
+**✅ All critical vulnerabilities patched:**
+- Next.js upgraded to **15.5.11** (latest stable backport)
+  - ✅ Patches HTTP request deserialization DoS (CVE affecting 13.0.0 - 15.0.8)
+  - ✅ Patches all Server Components DoS vulnerabilities
+  - ✅ Patches Authorization Bypass in Middleware
+  - ✅ Patches Cache Poisoning vulnerabilities
+  - ✅ Patches Server-Side Request Forgery in Server Actions
+- @sendgrid/mail upgraded to 8.1.6 (patches axios vulnerabilities)
 
-**⚠️ Known limitation:**
-- One remaining advisory (GHSA-h25m-26qc-wcjf) requires Next.js 15.5.10+
-- Upgrading to Next.js 15.x would require testing for breaking changes
-- This is a DoS vulnerability related to Image Optimizer remotePatterns
-- **Mitigation**: Avoid using remotePatterns in next.config.js or upgrade to Next.js 15.5.10+
+**⚠️ One moderate severity advisory remains:**
+- GHSA-5f7q-jpqc-wp7h: Unbounded Memory Consumption via PPR Resume Endpoint
+- **Impact**: Only affects applications using experimental PPR (Partial Prerendering) feature
+- **Mitigation**: This implementation does not use PPR, so this advisory does not pose a risk
+- **Alternative**: Upgrade to Next.js 16.1.6+ (canary/latest) if PPR is needed
+
+**Build Status**: ✅ Passing with Next.js 15.5.11
 
 ### 1. Webhook Signature Verification
 
