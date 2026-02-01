@@ -25,6 +25,8 @@ export async function GET(request: NextRequest) {
     let hasMore = true;
     let totalSynced = 0;
     const limit = 50;
+    // Maximum number of pages to sync per run (configurable via env)
+    const maxPages = parseInt(process.env.SYNC_MAX_PAGES || '5', 10);
 
     // Fetch and sync purchases with pagination
     while (hasMore) {
@@ -69,9 +71,9 @@ export async function GET(request: NextRequest) {
         page++;
       }
 
-      // Limit to 5 pages per sync to avoid timeout
-      if (page > 5) {
-        console.log('Reached page limit, stopping sync');
+      // Limit pages per sync to avoid timeout
+      if (page > maxPages) {
+        console.log(`Reached page limit (${maxPages}), stopping sync`);
         break;
       }
     }

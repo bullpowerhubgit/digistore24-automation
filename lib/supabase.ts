@@ -170,7 +170,9 @@ export async function updateAffiliateStats(affiliateId: string) {
   }
 
   const totalSales = salesData?.length || 0;
-  const totalCommission = salesData?.reduce((sum, sale) => sum + (sale.amount * 0.2), 0) || 0; // Assuming 20% commission
+  // Default commission rate is 20%, configurable via environment variable
+  const commissionRate = parseFloat(process.env.AFFILIATE_COMMISSION_RATE || '0.2');
+  const totalCommission = salesData?.reduce((sum, sale) => sum + (sale.amount * commissionRate), 0) || 0;
 
   // Update affiliate record
   const { error: updateError } = await supabase

@@ -170,12 +170,21 @@ export class DigistoreClient {
 
   /**
    * Verify webhook signature (if provided by Digistore24)
+   * TODO: Implement proper HMAC signature verification based on Digistore24's documentation
+   * This is a security-critical function that should be implemented before production use
    */
   verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
-    // This is a placeholder - implement actual signature verification
-    // based on Digistore24's webhook signature algorithm
+    // WARNING: This is a placeholder implementation
+    // Implement actual signature verification using HMAC-SHA256 or Digistore24's algorithm
+    // Example implementation (adjust based on Digistore24's actual algorithm):
+    // const crypto = require('crypto');
+    // const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    // return signature === expectedSignature;
+    
+    console.warn('Webhook signature verification is not implemented - this is a security risk');
     try {
-      // For now, return true if signature exists
+      // For development, accept any signature if present
+      // In production, this MUST be replaced with proper verification
       return !!signature;
     } catch (error) {
       console.error('Error verifying webhook signature:', error);
