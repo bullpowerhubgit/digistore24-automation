@@ -2,6 +2,22 @@
 
 ## Important Security Notes
 
+### Current Security Status
+
+**✅ Major vulnerabilities addressed:**
+- Next.js upgraded to 14.2.35 (latest in 14.x branch)
+- Patches DoS vulnerabilities with Server Components
+- Patches Authorization Bypass in Middleware
+- Patches Cache Poisoning vulnerabilities
+- Patches Server-Side Request Forgery in Server Actions
+- @sendgrid/mail upgraded to 8.1.6 (patches axios CSRF vulnerabilities)
+
+**⚠️ Known limitation:**
+- One remaining advisory (GHSA-h25m-26qc-wcjf) requires Next.js 15.5.10+
+- Upgrading to Next.js 15.x would require testing for breaking changes
+- This is a DoS vulnerability related to Image Optimizer remotePatterns
+- **Mitigation**: Avoid using remotePatterns in next.config.js or upgrade to Next.js 15.5.10+
+
 ### 1. Webhook Signature Verification
 
 **⚠️ CRITICAL: The webhook signature verification in `lib/digistore.ts` is currently a placeholder.**
