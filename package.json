@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vercel:setup": "bash setup-vercel-env.sh",
+    "vercel:deploy": "vercel --prod"
   },
   "dependencies": {
     "next": "^15.5.11",

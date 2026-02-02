@@ -59,7 +59,19 @@ DISCORD_WEBHOOK_URL=your_discord_webhook
 # Email (optional)
 SENDGRID_API_KEY=your_sendgrid_key
 NOTIFICATION_EMAIL=your@email.com
+
+# API Security
+API_SECRET_KEY=your_secret_key_for_api_authentication
+
+# Vercel Cron Job Authentication
+CRON_SECRET=your_cron_secret_for_vercel_authentication
 ```
+
+## 🚀 Quick Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bullpowerhubgit/digistore24-automation)
+
+**Complete deployment guide:** See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed step-by-step instructions.
 
 ## 🔧 Setup Guide
 
@@ -124,6 +136,14 @@ create policy "Allow service role full access" on affiliates
 
 ### 4. Deploy to Vercel
 
+**📖 Complete Deployment Guide:** See [DEPLOYMENT.md](./DEPLOYMENT.md) for comprehensive step-by-step instructions.
+
+**Quick Deploy:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bullpowerhubgit/digistore24-automation)
+
+Or via CLI:
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -131,36 +151,20 @@ npm i -g vercel
 # Login
 vercel login
 
-# Deploy
-vercel
-
-# Set environment variables
-vercel env add DIGISTORE24_API_KEY
-vercel env add SUPABASE_SERVICE_ROLE_KEY
-# ... add all other env vars
-
 # Deploy to production
 vercel --prod
 ```
 
-### 5. Setup Cron Jobs
+**Note:** The project includes a pre-configured `vercel.json` with cron jobs and optimized settings. Environment variables must be configured in Vercel Dashboard.
 
-Create `vercel.json`:
+### 5. Verify Deployment
 
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/daily-report",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/sync-data",
-      "schedule": "*/30 * * * *"
-    }
-  ]
-}
-```
+After deploying to Vercel:
+
+1. Visit your deployment URL: `https://your-project.vercel.app`
+2. Check the dashboard displays correctly
+3. Verify the webhook endpoint: `https://your-project.vercel.app/api/digistore/webhook`
+4. Check cron job is active in Vercel Dashboard → Settings → Cron Jobs
 
 ## 📁 Project Structure
 
