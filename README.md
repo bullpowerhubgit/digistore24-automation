@@ -2,6 +2,8 @@
 
 Complete automation suite for Digistore24 with Next.js 14, TypeScript, and real-time webhooks.
 
+> **Quick Deploy:** [Deploy to Vercel →](https://vercel.com/new/clone?repository-url=https://github.com/bullpowerhubgit/digistore24-automation) | [Quickstart Guide](./QUICKSTART.md) | [Full Deployment Guide](./DEPLOYMENT.md)
+
 ## ✨ Features
 
 - 🔄 **Real-time Webhooks** - Instant notifications for sales, refunds, and affiliates
