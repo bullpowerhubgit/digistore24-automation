@@ -5,18 +5,26 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 // Client for browser/public use
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 // Admin client for server-side operations (bypasses RLS)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+export const supabaseAdmin = supabaseUrl && supabaseServiceRoleKey
+  ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  : null;
 
 // Helper functions
 export async function insertSale(saleData: any) {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase is not configured');
+  }
+  
   const { data, error } = await supabaseAdmin
     .from('sales')
     .insert([saleData])
@@ -28,6 +36,10 @@ export async function insertSale(saleData: any) {
 }
 
 export async function updateSale(orderId: string, updates: any) {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase is not configured');
+  }
+  
   const { data, error } = await supabaseAdmin
     .from('sales')
     .update(updates)
@@ -40,6 +52,10 @@ export async function updateSale(orderId: string, updates: any) {
 }
 
 export async function getSales(limit = 50, offset = 0) {
+  if (!supabaseAdmin) {
+    return [];
+  }
+  
   const { data, error } = await supabaseAdmin
     .from('sales')
     .select('*')
@@ -51,6 +67,19 @@ export async function getSales(limit = 50, offset = 0) {
 }
 
 export async function getSalesStats() {
+  if (!supabaseAdmin) {
+    return {
+      today: 0,
+      week: 0,
+      month: 0,
+      total: 0,
+      todayCount: 0,
+      weekCount: 0,
+      monthCount: 0,
+      totalCount: 0,
+    };
+  }
+  
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -101,6 +130,10 @@ export async function getSalesStats() {
 }
 
 export async function upsertAffiliate(affiliateData: any) {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase is not configured');
+  }
+  
   const { data, error } = await supabaseAdmin
     .from('affiliates')
     .upsert([affiliateData], { onConflict: 'affiliate_id' })
