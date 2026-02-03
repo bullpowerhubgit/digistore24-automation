@@ -1,12 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/daily-report",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/sync-data",
-      "schedule": "*/30 * * * *"
-    }
-  ]
-}
+{\n  "version": 2,\n  "buildCommand": "npm run build",\n  "outputDirectory": "dist",\n  "devCommand": "npm run dev",\n  "installCommand": "npm install",\n  "framework": {\n    "preset": "nextjs"\n  },\n  "cron": [\n    {\n      "schedule": "0 * * * *",\n      "command": "node cron.js"\n    }\n  ]\n}
