@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     // Transform Digistore24 IPN format to our internal format
     const event = {
       event_type: eventType,
-      event_id: data.id || data.event_id || `${Date.now()}-${Math.random()}`,
+      event_id: data.id || data.event_id || crypto.randomUUID(),
       timestamp: data.timestamp || new Date().toISOString(),
       data: {
         order_id: data.order_id || data.transaction_id || 'unknown',
