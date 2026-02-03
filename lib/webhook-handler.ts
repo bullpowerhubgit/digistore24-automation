@@ -146,23 +146,42 @@ async function handleAffiliateApprovedEvent(data: WebhookEventData): Promise<voi
  */
 export function validateWebhookEvent(event: any): event is WebhookEvent {
   if (!event || typeof event !== 'object') {
+    console.warn('Validation failed: event is not an object');
     return false;
   }
 
-  // Check required fields
-  if (!event.event_type || !event.data) {
+  // Check required fields - be lenient
+  if (!event.event_type && !event.event) {
+    console.warn('Validation failed: missing event_type');
     return false;
   }
 
-  // Check event type is valid
-  const validEventTypes = ['on_payment', 'on_refund', 'on_affiliate_approved', 'on_rebill'];
-  if (!validEventTypes.includes(event.event_type)) {
+  if (!event.data || typeof event.data !== 'object') {
+    console.warn('Validation failed: missing or invalid data object');
     return false;
   }
 
-  // Check data has required fields
+  // Check event type is valid - be lenient
+  const eventType = event.event_type || event.event;
+  const validEventTypes = [
+    'on_payment', 
+    'on_refund', 
+    'on_affiliate_approved', 
+    'on_rebill',
+    'on_payment_incoming', // Additional Digistore24 events
+    'on_subscription_canceled',
+    'on_subscription_renewed',
+  ];
+  
+  if (!validEventTypes.includes(eventType)) {
+    console.warn(`Validation warning: unknown event type "${eventType}" - processing anyway`);
+    // Don't fail - just log warning
+  }
+
+  // Check data has at least order_id - be very lenient
   const data = event.data;
-  if (!data.order_id || !data.product_name || data.amount === undefined) {
+  if (!data.order_id && !data.transaction_id) {
+    console.warn('Validation failed: missing order_id or transaction_id');
     return false;
   }
 

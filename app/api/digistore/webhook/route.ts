@@ -1,39 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processWebhookEvent, validateWebhookEvent } from '@/lib/webhook-handler';
+import { processWebhookEvent } from '@/lib/webhook-handler';
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
-    const event = await request.json();
+    console.log('=== Digistore24 Webhook Received ===');
+    
+    let data: any = {};
+    const contentType = request.headers.get('content-type') || '';
 
-    console.log('Received webhook event:', event.event_type);
-
-    // Validate event structure
-    if (!validateWebhookEvent(event)) {
-      console.error('Invalid webhook event structure:', event);
-      return NextResponse.json(
-        { error: 'Invalid event structure' },
-        { status: 400 }
-      );
+    // Parse request body - support both JSON and form data
+    if (contentType.includes('application/json')) {
+      data = await request.json();
+      console.log('Received JSON data:', JSON.stringify(data, null, 2));
+    } else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      data = Object.fromEntries(formData.entries());
+      console.log('Received form data:', JSON.stringify(data, null, 2));
+    } else {
+      // Try to parse as text and then JSON
+      const text = await request.text();
+      console.log('Received raw text:', text);
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // If not JSON, treat as form data
+        const params = new URLSearchParams(text);
+        data = Object.fromEntries(params.entries());
+      }
     }
 
-    // Process the webhook event
-    await processWebhookEvent(event);
+    // Digistore24 sends event type in 'event' field
+    const eventType = data.event || data.event_type;
+    console.log('Event type:', eventType);
 
-    return NextResponse.json(
-      { success: true, message: 'Event processed successfully' },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Error processing webhook:', error);
-
-    return NextResponse.json(
-      {
-        error: 'Failed to process webhook event',
-        message: error instanceof Error ? error.message : 'Unknown error',
+    // Transform Digistore24 IPN format to our internal format
+    const event = {
+      event_type: eventType,
+      event_id: data.id || data.event_id || `${Date.now()}-${Math.random()}`,
+      timestamp: data.timestamp || new Date().toISOString(),
+      data: {
+        order_id: data.order_id || data.transaction_id || 'unknown',
+        product_id: data.product_id || '',
+        product_name: data.product_name || data.product || 'Unknown Product',
+        amount: parseFloat(data.amount || data.pay_amount || '0'),
+        currency: data.currency || 'EUR',
+        buyer_email: data.buyer_email || data.email || '',
+        buyer_name: data.buyer_name || data.custom_name || data.billing_name || '',
+        affiliate_id: data.affiliate_id || data.affiliate || null,
+        status: data.status || 'completed',
+        payment_date: data.payment_date || new Date().toISOString(),
       },
-      { status: 500 }
-    );
+    };
+
+    console.log('Transformed event:', JSON.stringify(event, null, 2));
+
+    // Process the webhook event (don't await to respond quickly)
+    processWebhookEvent(event).catch(error => {
+      console.error('Error processing webhook event (async):', error);
+      // Don't throw - we already responded to Digistore24
+    });
+
+    // ALWAYS return 200 OK with "OK" text - Digistore24 requirement
+    return new Response('OK', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+
+  } catch (error) {
+    console.error('Error in webhook handler:', error);
+    
+    // Even on error, return 200 OK so Digistore24 doesn't retry
+    // Log the error but don't fail the webhook
+    return new Response('OK', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    });
   }
 }
 
@@ -43,6 +84,7 @@ export async function GET() {
     {
       message: 'Digistore24 webhook endpoint is active',
       timestamp: new Date().toISOString(),
+      note: 'Use POST to send webhook events',
     },
     { status: 200 }
   );
