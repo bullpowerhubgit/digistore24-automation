@@ -7,7 +7,15 @@ export function createServerSupabaseClient() {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Missing Supabase environment variables');
+    const missingVars = [];
+    if (!supabaseUrl) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
+    if (!supabaseKey) missingVars.push('SUPABASE_SERVICE_ROLE_KEY');
+    
+    const errorMsg = `Missing Supabase environment variables: ${missingVars.join(', ')}`;
+    console.error('=== CRITICAL ERROR ===');
+    console.error(errorMsg);
+    console.error('===================');
+    throw new Error(errorMsg);
   }
 
   return createClient(supabaseUrl, supabaseKey, {
@@ -32,31 +40,46 @@ export function createClientSupabaseClient() {
 
 // Sales Operations
 export async function saveSale(sale: Omit<Sale, 'id' | 'created_at'>) {
-  const supabase = createServerSupabaseClient();
+  console.log('=== saveSale function called ===');
+  console.log('Order ID:', sale.order_id);
+  
+  try {
+    const supabase = createServerSupabaseClient();
+    console.log('Supabase client created successfully');
 
-  const { data, error } = await supabase
-    .from('sales')
-    .upsert(
-      {
-        order_id: sale.order_id,
-        product_name: sale.product_name,
-        amount: sale.amount,
-        buyer_email: sale.buyer_email,
-        buyer_name: sale.buyer_name,
-        affiliate_id: sale.affiliate_id,
-        status: sale.status,
-      },
-      { onConflict: 'order_id' }
-    )
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from('sales')
+      .upsert(
+        {
+          order_id: sale.order_id,
+          product_name: sale.product_name,
+          amount: sale.amount,
+          buyer_email: sale.buyer_email,
+          buyer_name: sale.buyer_name,
+          affiliate_id: sale.affiliate_id,
+          status: sale.status,
+        },
+        { onConflict: 'order_id' }
+      )
+      .select()
+      .single();
 
-  if (error) {
-    console.error('Error saving sale:', error);
-    throw new Error(`Failed to save sale: ${error.message}`);
+    if (error) {
+      console.error('Supabase error saving sale:', error);
+      console.error('Error code:', error.code);
+      console.error('Error details:', error.details);
+      console.error('Error hint:', error.hint);
+      console.error('Error message:', error.message);
+      throw new Error(`Failed to save sale: ${error.message}`);
+    }
+
+    console.log('Sale saved successfully to database');
+    return data;
+  } catch (error) {
+    console.error('=== Exception in saveSale ===');
+    console.error('Error:', error);
+    throw error;
   }
-
-  return data;
 }
 
 export async function getSales(params: {

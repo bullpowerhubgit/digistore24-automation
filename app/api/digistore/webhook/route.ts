@@ -4,9 +4,21 @@ import { processWebhookEvent } from '@/lib/webhook-handler';
 export async function POST(request: NextRequest) {
   try {
     console.log('=== Digistore24 Webhook Received ===');
+    console.log('Timestamp:', new Date().toISOString());
+    
+    // Check environment variables early
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('CRITICAL: Missing Supabase environment variables');
+      console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'present' : 'MISSING');
+      console.error('SUPABASE_SERVICE_ROLE_KEY:', supabaseKey ? 'present' : 'MISSING');
+    }
     
     let data: any = {};
     const contentType = request.headers.get('content-type') || '';
+    console.log('Content-Type:', contentType);
 
     // Parse request body - support both JSON and form data
     if (contentType.includes('application/json')) {
@@ -56,7 +68,11 @@ export async function POST(request: NextRequest) {
 
     // Process the webhook event (don't await to respond quickly)
     processWebhookEvent(event).catch(error => {
-      console.error('Error processing webhook event (async):', error);
+      console.error('=== Error processing webhook event (async) ===');
+      console.error('Error name:', (error as any)?.name);
+      console.error('Error message:', (error as any)?.message);
+      console.error('Error stack:', (error as any)?.stack);
+      console.error('Full error:', error);
       // Don't throw - we already responded to Digistore24
     });
 
@@ -67,7 +83,11 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error in webhook handler:', error);
+    console.error('=== Error in webhook handler (main try/catch) ===');
+    console.error('Error name:', (error as any)?.name);
+    console.error('Error message:', (error as any)?.message);
+    console.error('Error stack:', (error as any)?.stack);
+    console.error('Full error:', error);
     
     // Even on error, return 200 OK so Digistore24 doesn't retry
     // Log the error but don't fail the webhook
