@@ -259,9 +259,9 @@ export async function getSalesStats() {
   const monthCount = monthData?.length || 0;
 
   return {
-    today: { revenue: todayRevenue, sales: todayCount },
-    week: { revenue: weekRevenue, sales: weekCount },
-    month: { revenue: monthRevenue, sales: monthCount },
-    total: { revenue: totalRevenue, sales: totalCount },
+    today: { revenue: todayRevenue, count: todayCount },
+    week: { revenue: weekRevenue, count: weekCount },
+    month: { revenue: monthRevenue, count: monthCount },
+    total: { revenue: totalRevenue, count: totalCount },
   };
 }
