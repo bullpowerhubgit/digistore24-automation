@@ -61,9 +61,9 @@ SENDGRID_API_KEY=your_sendgrid_key
 NOTIFICATION_EMAIL=your@email.com
 ```
 
-## 🔧 Environment Variables Setup
+## 🔧 Supabase Setup for Vercel
 
-### Required Variables
+### Required Supabase Variables
 
 Create a `.env.local` file in the root directory:
 
