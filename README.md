@@ -61,6 +61,34 @@ SENDGRID_API_KEY=your_sendgrid_key
 NOTIFICATION_EMAIL=your@email.com
 ```
 
+## 🔧 Environment Variables Setup
+
+### Required Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+### Get your Supabase credentials:
+
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to **Settings** → **API**
+4. Copy the **URL** and **anon** key
+5. Copy the **service_role** key (keep this secret!)
+
+### Deploy to Vercel:
+
+Add the same environment variables in Vercel:
+- Go to **Project Settings** → **Environment Variables**
+- Add all three variables for **Production**, **Preview**, and **Development**
+
+**Important:** After adding environment variables in Vercel, trigger a redeploy for the changes to take effect.
+
 ## 🔧 Setup Guide
 
 ### 1. Get Digistore24 API Key
