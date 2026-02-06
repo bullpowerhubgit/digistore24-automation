@@ -190,6 +190,11 @@ export async function updateAffiliateStats(affiliateId: string) {
 }
 
 // Statistics
+/**
+ * Get sales statistics for different time periods
+ * @returns Object containing revenue and sales count for today, week, month, and total
+ * Format: { today: { revenue: number, sales: number }, week: {...}, month: {...}, total: {...} }
+ */
 export async function getSalesStats() {
   const supabase = createServerSupabaseClient();
 
@@ -254,9 +259,9 @@ export async function getSalesStats() {
   const monthCount = monthData?.length || 0;
 
   return {
-    today: { revenue: todayRevenue, count: todayCount },
-    week: { revenue: weekRevenue, count: weekCount },
-    month: { revenue: monthRevenue, count: monthCount },
-    total: { revenue: totalRevenue, count: totalCount },
+    today: { revenue: todayRevenue, sales: todayCount },
+    week: { revenue: weekRevenue, sales: weekCount },
+    month: { revenue: monthRevenue, sales: monthCount },
+    total: { revenue: totalRevenue, sales: totalCount },
   };
 }
