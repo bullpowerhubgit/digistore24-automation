@@ -89,6 +89,8 @@ Add the same environment variables in Vercel:
 
 **Important:** After adding environment variables in Vercel, trigger a redeploy for the changes to take effect.
 
+📖 **For detailed Supabase setup, authentication, and database query examples, see [Supabase Integration Guide](docs/SUPABASE_INTEGRATION.md)**
+
 ## 🔧 Setup Guide
 
 ### 1. Get Digistore24 API Key
