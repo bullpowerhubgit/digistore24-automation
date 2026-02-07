@@ -109,6 +109,8 @@ Add the same environment variables in Vercel:
 4. Select events: `on_payment`, `on_refund`, `on_affiliate_approved`
 5. Save the webhook
 
+📖 **To verify your webhook is configured correctly, see [Deployment Verification Guide](docs/DEPLOYMENT_VERIFICATION.md)**
+
 ### 3. Setup Supabase
 
 1. Create a new project on [Supabase](https://supabase.com)
@@ -305,6 +307,8 @@ MIT License - see LICENSE file for details
 - Verify webhook URL is correct in Digistore24
 - Check that URL is accessible (not localhost)
 - Ensure events are selected in webhook settings
+- 📖 See [Webhook Debugging Guide](WEBHOOK_DEBUGGING.md) for detailed troubleshooting
+- 📖 See [Deployment Verification Guide](docs/DEPLOYMENT_VERIFICATION.md) to test your webhook
 
 ### API errors
 - Verify API key is correct
@@ -315,6 +319,7 @@ MIT License - see LICENSE file for details
 - Verify Supabase credentials
 - Check Row Level Security policies
 - Ensure service role key is used for admin operations
+- 📖 See [Supabase Integration Guide](docs/SUPABASE_INTEGRATION.md) for setup help
 
 ## 📞 Support
 
