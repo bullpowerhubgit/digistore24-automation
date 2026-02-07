@@ -6,7 +6,9 @@ import { notifyNewSale, notifyRefund } from './notifications';
  * Process incoming webhook event from Digistore24
  */
 export async function processWebhookEvent(event: WebhookEvent): Promise<void> {
-  console.log('Processing webhook event:', event.event_type, event.event_id);
+  console.log('=== Processing webhook event ===');
+  console.log('Event type:', event.event_type);
+  console.log('Event ID:', event.event_id);
 
   try {
     switch (event.event_type) {
@@ -32,7 +34,13 @@ export async function processWebhookEvent(event: WebhookEvent): Promise<void> {
 
     console.log('Webhook event processed successfully:', event.event_id);
   } catch (error) {
-    console.error('Error processing webhook event:', error);
+    console.error('=== Error processing webhook event ===');
+    console.error('Event type:', event.event_type);
+    console.error('Event ID:', event.event_id);
+    console.error('Error name:', (error as any)?.name);
+    console.error('Error message:', (error as any)?.message);
+    console.error('Error stack:', (error as any)?.stack);
+    console.error('Full error:', error);
     throw error;
   }
 }
@@ -41,24 +49,35 @@ export async function processWebhookEvent(event: WebhookEvent): Promise<void> {
  * Handle payment event
  */
 async function handlePaymentEvent(data: WebhookEventData): Promise<void> {
-  console.log('Processing payment event for order:', data.order_id);
+  console.log('=== Processing payment event ===');
+  console.log('Order ID:', data.order_id);
+  console.log('Product:', data.product_name);
+  console.log('Amount:', data.amount);
 
-  // Save sale to database
-  const sale = await saveSale({
-    order_id: data.order_id,
-    product_name: data.product_name,
-    amount: data.amount,
-    buyer_email: data.buyer_email,
-    buyer_name: data.buyer_name,
-    affiliate_id: data.affiliate_id,
-    status: 'completed',
-  });
+  try {
+    // Save sale to database
+    console.log('Attempting to save sale to database...');
+    const sale = await saveSale({
+      order_id: data.order_id,
+      product_name: data.product_name,
+      amount: data.amount,
+      buyer_email: data.buyer_email,
+      buyer_name: data.buyer_name,
+      affiliate_id: data.affiliate_id,
+      status: 'completed',
+    });
 
-  console.log('Sale saved:', sale.id);
+    console.log('Sale saved successfully:', sale.id);
+  } catch (error) {
+    console.error('=== Error saving sale ===');
+    console.error('Error:', error);
+    throw error; // Re-throw to be caught by parent handler
+  }
 
   // Update affiliate stats if applicable
   if (data.affiliate_id) {
     try {
+      console.log('Updating affiliate stats for:', data.affiliate_id);
       await updateAffiliateStats(data.affiliate_id);
       console.log('Affiliate stats updated:', data.affiliate_id);
     } catch (error) {
@@ -68,15 +87,20 @@ async function handlePaymentEvent(data: WebhookEventData): Promise<void> {
   }
 
   // Send notifications
-  await notifyNewSale({
-    order_id: data.order_id,
-    product_name: data.product_name,
-    amount: data.amount,
-    buyer_name: data.buyer_name,
-    buyer_email: data.buyer_email,
-  });
-
-  console.log('Notifications sent for order:', data.order_id);
+  try {
+    console.log('Sending notifications...');
+    await notifyNewSale({
+      order_id: data.order_id,
+      product_name: data.product_name,
+      amount: data.amount,
+      buyer_name: data.buyer_name,
+      buyer_email: data.buyer_email,
+    });
+    console.log('Notifications sent for order:', data.order_id);
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+    // Don't fail the whole operation if notifications fail
+  }
 }
 
 /**
